@@ -1,0 +1,38 @@
+{
+  "exported_at": "2026-05-24 17:40:03",
+  "total_users": 4,
+  "users": [
+    {
+      "id": 1,
+      "name": "Admin",
+      "email": "admin@netflux.com",
+      "password": "admin123",
+      "user_type": "admin",
+      "created_at": "2026-05-21 04:35:13"
+    },
+    {
+      "id": 2,
+      "name": "vcjxacgvj",
+      "email": "asesc@gmail.com",
+      "password": "12345600",
+      "user_type": "user",
+      "created_at": "2026-05-21 15:17:30"
+    },
+    {
+      "id": 3,
+      "name": "msgdhjsagdj",
+      "email": "bckdc@gmail.com",
+      "password": "789456",
+      "user_type": "user",
+      "created_at": "2026-05-21 21:58:29"
+    },
+    {
+      "id": 4,
+      "name": "لاترتا",
+      "email": "hgdchg@gmail.com",
+      "password": "447744",
+      "user_type": "user",
+      "created_at": "2026-05-22 02:15:12"
+    }
+  ]
+}
