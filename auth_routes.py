@@ -5,7 +5,7 @@ routes/auth_routes.py
 
 from flask import Blueprint, render_template_string, request, redirect, session
 from models import User, DatabaseConnection
-from templates.auth_templates import LOGIN_TEMPLATE, REGISTER_TEMPLATE, REGISTER_SUCCESS_TEMPLATE
+from auth_templates import LOGIN_TEMPLATE, REGISTER_TEMPLATE, REGISTER_SUCCESS_TEMPLATE
 import json, os
 from datetime import datetime
 

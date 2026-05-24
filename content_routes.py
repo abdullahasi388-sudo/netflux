@@ -5,8 +5,8 @@ routes/content_routes.py
 
 from flask import Blueprint, render_template_string, request, redirect, session
 from models import Content, User, Favorite, WatchHistory
-from templates.main_templates  import INDEX_TEMPLATE, WATCH_TEMPLATE, PROFILE_TEMPLATE
-from templates.admin_templates import ADD_CONTENT_TEMPLATE, EDIT_CONTENT_TEMPLATE
+from main_templates  import INDEX_TEMPLATE, WATCH_TEMPLATE, PROFILE_TEMPLATE
+from admin_templates import ADD_CONTENT_TEMPLATE, EDIT_CONTENT_TEMPLATE
 
 content_bp = Blueprint('content', __name__)
 
