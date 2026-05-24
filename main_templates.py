@@ -607,6 +607,17 @@ INDEX_TEMPLATE = '''
             </div>
             {% endfor %}
         </div>
+        
+        <!-- زر تحميل المزيد -->
+        <div style="text-align:center; margin:30px 0;">
+            <button id="loadMoreBtn" onclick="loadMore()" style="
+                padding:14px 40px; background:linear-gradient(135deg,#e50914,#b0070f);
+                color:white; border:none; border-radius:12px; font-size:16px;
+                font-weight:700; cursor:pointer; display:none;
+                box-shadow:0 8px 25px rgba(229,9,20,0.4);">
+                ⬇ Daha Fazla Yükle
+            </button>
+        </div>
     </div>
     
     <script>
@@ -672,6 +683,47 @@ INDEX_TEMPLATE = '''
             }, 3000);
         }
         
+        // ===== SAYFALAMA (PAGINATION) =====
+        const CARDS_PER_PAGE = 50;
+        let currentPage = 1;
+        let allCards = [];
+        
+        function initPagination() {
+            allCards = Array.from(document.querySelectorAll('.content-card'));
+            // Hide all cards first
+            allCards.forEach(c => c.style.display = 'none');
+            // Show first 20
+            showPage(1);
+        }
+        
+        function showPage(page) {
+            const start = 0;
+            const end = page * CARDS_PER_PAGE;
+            let shown = 0;
+            allCards.forEach((card, i) => {
+                if (i < end && card.dataset.hidden !== 'true') {
+                    card.style.display = '';
+                    shown++;
+                }
+            });
+            const btn = document.getElementById('loadMoreBtn');
+            if (end < allCards.length) {
+                btn.style.display = 'inline-block';
+                btn.textContent = `⬇ Daha Fazla Yükle (${allCards.length - end} kaldı)`;
+            } else {
+                btn.style.display = 'none';
+            }
+        }
+        
+        function loadMore() {
+            currentPage++;
+            showPage(currentPage);
+        }
+        
+        window.addEventListener('DOMContentLoaded', function() {
+            initPagination();
+        });
+
         // ===== ARAMA + FİLTRELEME =====
         function filterContent() {
             const search   = document.getElementById('searchInput').value.toLowerCase();
@@ -679,10 +731,11 @@ INDEX_TEMPLATE = '''
             const category = document.getElementById('categoryFilter').value.toLowerCase();
             const rating   = parseFloat(document.getElementById('ratingFilter').value) || 0;
             
-            const cards = document.querySelectorAll('.content-card');
+            allCards = Array.from(document.querySelectorAll('.content-card'));
             let visible = 0;
+            currentPage = 1;
             
-            cards.forEach(card => {
+            allCards.forEach(card => {
                 const title    = card.dataset.title || '';
                 const cardType = card.dataset.type  || '';
                 const cardCat  = card.dataset.category || '';
@@ -694,12 +747,31 @@ INDEX_TEMPLATE = '''
                 const matchRating   = !rating   || cardRat >= rating;
                 
                 if (matchSearch && matchType && matchCategory && matchRating) {
-                    card.style.display = '';
+                    card.dataset.hidden = 'false';
                     visible++;
                 } else {
+                    card.dataset.hidden = 'true';
                     card.style.display = 'none';
                 }
             });
+            
+            // Show first page of results
+            if (visible > 0) {
+                let shown = 0;
+                allCards.forEach(card => {
+                    if (card.dataset.hidden !== 'true') {
+                        if (shown < CARDS_PER_PAGE) {
+                            card.style.display = '';
+                            shown++;
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    }
+                });
+                const btn = document.getElementById('loadMoreBtn');
+                btn.style.display = visible > CARDS_PER_PAGE ? 'inline-block' : 'none';
+                if (visible > CARDS_PER_PAGE) btn.textContent = `⬇ Daha Fazla Yükle (${visible - CARDS_PER_PAGE} kaldı)`;
+            }
             
             document.getElementById('noResults').style.display = visible === 0 ? 'block' : 'none';
         }
@@ -739,12 +811,8 @@ INDEX_TEMPLATE = '''
             });
         }
         
-        // Load saved ratings on page load - do NOT call filterContent on load
+        // Load saved ratings on page load
         window.addEventListener('DOMContentLoaded', function() {
-            // Make sure all cards are visible on page load
-            document.querySelectorAll('.content-card').forEach(c => c.style.display = '');
-            document.getElementById('noResults').style.display = 'none';
-            
             fetch('/api/my_ratings')
                 .then(r => r.json())
                 .then(data => {
@@ -979,7 +1047,7 @@ WATCH_TEMPLATE = '''
                 const videoUrl = "{{ content.video_url }}";
                 const videoId = videoUrl.split('/').pop().split('?')[0];
                 
-                // Load saved progress — pause until user chooses
+                // Load saved progress — show dialog if progress exists
                 fetch(`/api/progress/${contentId}`)
                     .then(r => r.json())
                     .then(data => {
@@ -987,9 +1055,6 @@ WATCH_TEMPLATE = '''
                             savedProgress = data.progress;
                             document.getElementById('resumeTimeDisplay').textContent = formatTime(savedProgress);
                             document.getElementById('resumeDialog').classList.add('show');
-                            video.pause();
-                        } else {
-                            video.play();
                         }
                     });
                 
@@ -1099,7 +1164,7 @@ WATCH_TEMPLATE = '''
                 const video = document.getElementById('videoPlayer');
                 let savedProgress = 0;
                 
-                // Load saved progress — pause until user chooses
+                // Load saved progress — show dialog if progress exists
                 fetch(`/api/progress/${contentId}`)
                     .then(r => r.json())
                     .then(data => {
@@ -1107,9 +1172,6 @@ WATCH_TEMPLATE = '''
                             savedProgress = data.progress;
                             document.getElementById('resumeTimeDisplay').textContent = formatTime(savedProgress);
                             document.getElementById('resumeDialog').classList.add('show');
-                            video.pause();
-                        } else {
-                            video.play();
                         }
                     });
                 
