@@ -739,8 +739,12 @@ INDEX_TEMPLATE = '''
             });
         }
         
-        // Load saved ratings on page load
+        // Load saved ratings on page load - do NOT call filterContent on load
         window.addEventListener('DOMContentLoaded', function() {
+            // Make sure all cards are visible on page load
+            document.querySelectorAll('.content-card').forEach(c => c.style.display = '');
+            document.getElementById('noResults').style.display = 'none';
+            
             fetch('/api/my_ratings')
                 .then(r => r.json())
                 .then(data => {
